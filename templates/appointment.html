@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediBot - Doctor Appointment</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background: #ffffff;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #007bff;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+        }
+
+        .nav-links a:hover {
+            background: #007bff;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .login-btn {
+            background: #007bff;
+            color: white !important;
+            padding: 0.8rem 1.5rem !important;
+        }
+
+        .container {
+            max-width: 1400px;
+            height: 700px;
+            margin: 80px auto 0;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 5fr;
+            gap: 2rem;
+        }
+
+        .header {
+            grid-column: 1 / -1;
+            width: 600px;
+            background: linear-gradient(135deg, #007bff, #00b4d8);
+            color: white;
+            padding: 2rem;
+            text-align: left;
+            border-radius: 15px;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .doctor-animation {
+            width: 700px;
+            height: 400px;
+            background-color: #ffffff;
+            top: 10px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .doctor-animation img {
+            width: 100%;
+            max-width: 1400px;
+            animation: doctorAnimation 5s linear infinite;
+        }
+
+        .booking-section {
+            position: relative;
+            top: -170px;
+            width: 700px;
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+        }
+
+        input:focus, select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.25);
+            outline: none;
+            background-color: white;
+        }
+
+        .time-slots {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 0.5rem;
+        }
+
+        .time-slot {
+            padding: 12px 24px;
+            background-color: #f8f9fa;
+            border: 2px solid #e9ecef;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .time-slot:hover {
+            background-color: #e3f2fd;
+            border-color: #007bff;
+            transform: translateY(-2px);
+        }
+
+        .time-slot.selected {
+            background-color: #007bff;
+            color: white;
+            border-color: #0056b3;
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0,123,255,0.2);
+        }
+
+        .confirm-btn {
+            background: #28a745;
+            color: white;
+            padding: 1.2rem 2.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .confirm-btn:hover {
+            background: #218838;
+            transform: scale(1.02);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: white;
+            padding: 3rem;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 500px;
+            animation: modalSlide 0.3s ease;
+        }
+
+        .hamburger {
+            display: none;
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        .hamburger .line {
+            width: 25px;
+            height: 3px;
+            background-color: #333;
+            margin: 4px 0;
+            transition: all 0.3s ease;
+        }
+
+        .loader {
+            display: none;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #0059ff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: none;
+            padding: 0.5rem;
+            border-radius: 8px;
+            background-color: #fff5f5;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes modalSlide {
+            from { transform: translateY(-100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 2rem;
+            }
+
+            .booking-section {
+                padding: 1.5rem;
+            }
+
+            .time-slot {
+                padding: 10px 20px;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: white;
+                flex-direction: column;
+                padding: 1rem;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .hamburger {
+                display: block;
+            }
+
+            .nav-links a {
+                width: 100%;
+                text-align: center;
+            }
+        }
+        dotlottie-wc {
+    width: 700px;
+    height: 500px;
+  }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+            MediBot
+        </div>
+        <div class="hamburger" onclick="toggleMenu()">
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+        </div>
+        <div class="nav-links">
+            <a href="/user_home">Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1>Book Your Doctor Appointment</h1>
+            <p>Fast, Secure, and Convenient Healthcare Access</p>
+        </div>
+        
+        <div class="doctor-animation">
+            <dotlottie-wc src="https://lottie.host/e0cc4766-e096-4df7-884b-0bdc6b906470/L7dfq9oufR.lottie" autoplay loop ></dotlottie-wc>
+        </div>
+        
+        <div class="booking-section">
+            <div class="booking-form">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" placeholder="Vasudev Krish">
+                    <div class="error-message" id="name-error">Please enter a valid name</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" placeholder="9876543210">
+                    <div class="error-message" id="phone-error">Please enter a valid 10-digit number</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="krishna@example.com">
+                    <div class="error-message" id="email-error">Please enter a valid email</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="doctor">Select Doctor</label>
+                    <select id="doctor">
+                        <option value="">Choose a doctor</option>
+                        <option value="dr_smith">Dr. Nirmal (Dermatologist)</option>
+                        <option value="dr_jones">Dr. Nagaraju (Cardiologist)</option>
+                        <option value="dr_wilson">Dr. Prudhivk (Pediatrician)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="date">Appointment Date</label>
+                    <input type="date" id="date">
+                </div>
+
+                <div class="form-group">
+                    <label>Available Time Slots</label>
+                    <div class="time-slots" id="time-slots"></div>
+                </div>
+
+                <div class="loader"></div>
+                <button class="confirm-btn" onclick="submitBooking()">Confirm Appointment</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="confirmation-modal">
+        <div class="modal-content">
+            <h2>🎉 Appointment Booked Successfully!</h2>
+            <p>Check your email for confirmation details.</p>
+            <button onclick="closeModal()" class="confirm-btn" style="margin-top: 1rem;">Close</button>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.3.0/dist/dotlottie-wc.js" type="module"></script>
+
+    <script>
+        const dateInput = document.getElementById('date');
+        dateInput.min = new Date().toISOString().split('T')[0];
+        let selectedTime = null;
+        const timeSlots = [
+            '10:00 AM', '11:00 AM', '02:00 PM', '03:00 PM', '04:00 PM'
+        ];
+
+        function generateTimeSlots() {
+            const container = document.getElementById('time-slots');
+            container.innerHTML = '';
+            timeSlots.forEach(time => {
+                const slot = document.createElement('div');
+                slot.className = 'time-slot';
+                if (time === selectedTime) {
+                    slot.classList.add('selected');
+                }
+                slot.textContent = time;
+                slot.onclick = () => selectTimeSlot(time, slot);
+                container.appendChild(slot);
+            });
+        }
+
+        function selectTimeSlot(time, element) {
+            const allSlots = document.querySelectorAll('.time-slot');
+            allSlots.forEach(slot => slot.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedTime = time;
+        }
+
+        function toggleMenu() {
+            const navLinks = document.querySelector('.nav-links');
+            navLinks.classList.toggle('active');
+        }
+
+        function toggleError(id, show) {
+            const element = document.getElementById(id);
+            element.style.display = show ? 'block' : 'none';
+        }
+
+        function submitBooking() {
+            const isValid = validateForm();
+            if (isValid) {
+                showLoader(true);
+                setTimeout(() => {
+                    showLoader(false);
+                    showModal();
+                    saveToLocalStorage();
+                    resetForm();
+                }, 1500);
+            }
+        }
+
+        function validateForm() {
+            const nameValid = document.getElementById('name').value.trim().length >= 3;
+            const phoneValid = /^\d{10}$/.test(document.getElementById('phone').value);
+            const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(document.getElementById('email').value);
+            const doctorValid = document.getElementById('doctor').value !== '';
+            const dateValid = document.getElementById('date').value !== '';
+            const timeValid = selectedTime !== null;
+
+            toggleError('name-error', !nameValid);
+            toggleError('phone-error', !phoneValid);
+            toggleError('email-error', !emailValid);
+
+            return nameValid && phoneValid && emailValid && doctorValid && dateValid && timeValid;
+        }
+
+        function showLoader(show) {
+            document.querySelector('.loader').style.display = show ? 'block' : 'none';
+        }
+
+        function showModal() {
+            document.getElementById('confirmation-modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('confirmation-modal').style.display = 'none';
+        }
+
+        function resetForm() {
+            document.getElementById('name').value = '';
+            document.getElementById('phone').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('doctor').selectedIndex = 0;
+            document.getElementById('date').value = '';
+            selectedTime = null;
+            generateTimeSlots();
+        }
+
+        function saveToLocalStorage() {
+            const booking = {
+                id: Date.now(),
+                name: document.getElementById('name').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                doctor: document.getElementById('doctor').selectedOptions[0].text,
+                date: document.getElementById('date').value,
+                time: selectedTime
+            };
+
+            const appointments = JSON.parse(localStorage.getItem('appointments') || '[]');
+            appointments.push(booking);
+            localStorage.setItem('appointments', JSON.stringify(appointments));
+        }
+
+        document.getElementById('user-profile').addEventListener('click', function() {
+            const isLoggedIn = this.textContent === 'Logout';
+            this.textContent = isLoggedIn ? 'Login' : 'Logout';
+            alert(isLoggedIn ? 'You have logged out.' : 'You are now logged in.');
+        });
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('confirmation-modal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        generateTimeSlots();
+    </script>
+</body>
+</html>
