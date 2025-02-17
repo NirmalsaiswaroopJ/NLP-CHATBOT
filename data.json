@@ -1,0 +1,216 @@
+{
+  "intents": [
+      {
+          "tag": "greeting",
+          "patterns": [
+              "Hi there", 
+              "Hello", 
+              "Hey", 
+              "How are you?", 
+              "Good day", 
+              "Greetings", 
+              "What's up?", 
+              "Hi!", 
+              "Hello there", 
+              "Howdy"
+          ],
+          "responses": [
+              "Hello! How can I assist you today?", 
+              "Hi there! How can I help?", 
+              "Hello, thanks for asking!", 
+              "Welcome! What can I do for you?", 
+              "Great to see you! How may I help?",
+              "Hi! I'm ready to assist you.",
+              "Greetings! How can I support you today?"
+          ],
+          "context": [""]
+      },
+      {
+          "tag": "goodbye",
+          "patterns": [
+              "Bye", 
+              "See you later", 
+              "Goodbye", 
+              "Take care", 
+              "Till next time",
+              "Catch you later",
+              "Bye bye",
+              "Talk to you later",
+              "Gotta go",
+              "I'm done"
+          ],
+          "responses": [
+              "Goodbye! Take care!", 
+              "See you soon!", 
+              "Bye! Feel free to reach out anytime.",
+              "Have a great day!",
+              "Thanks for chatting. Goodbye!",
+              "Take care and stay well!",
+              "Until next time!"
+          ],
+          "context": [""]
+      },
+      {
+          "tag": "thanks",
+          "patterns": [
+              "Thanks", 
+              "Thank you", 
+              "That's helpful", 
+              "Awesome, thanks", 
+              "Thanks for your help",
+              "Much appreciated",
+              "You're awesome",
+              "Appreciate it",
+              "Thank you so much",
+              "Nice one"
+          ],
+          "responses": [
+              "Happy to help!", 
+              "Anytime!", 
+              "You're welcome!",
+              "Glad I could assist you.",
+              "It's my pleasure!",
+              "Always here to help.",
+              "No problem at all.",
+              "Delighted I could be of service."
+          ],
+          "context": [""]
+      },
+      {
+          "tag": "appointment_prompt",
+          "patterns": [
+              "I want to make an appointment", 
+              "Book an appointment", 
+              "I need to schedule an appointment", 
+              "Can I book an appointment?", 
+              "How do I make an appointment?",
+              "Scheduling a new appointment",
+              "When can I get an appointment?",
+              "Need to set up an appointment",
+              "Appointment booking",
+              "Looking to book a slot",
+              "Want an appointment",
+              "appointment",
+              "Need an appointment",
+              "I think i need an appointment"
+          ],
+          "responses": [
+              "To make an appointment, you need to log in first. Would you like to go to the login page?",
+              "Appointment booking requires authentication. Shall I direct you to login?",
+              "Please log in to access our appointment scheduling system.",
+              "Great! Let's get you logged in to book your appointment.",
+              "Access to appointment scheduling is through your personal account."
+          ],
+          "context": [""]
+      },
+      {
+          "tag": "appointment_instructions",
+          "patterns": [
+              "What do I need to do for an appointment?", 
+              "How can I schedule an appointment?", 
+              "Tell me how to book an appointment", 
+              "How do I proceed with an appointment?",
+              "Steps to book an appointment",
+              "Appointment booking process",
+              "What's the procedure for scheduling?",
+              "Guide me through booking an appointment"
+          ],
+          "responses": [
+              "To book an appointment, please log in with your account. After logging in, you can choose a provider and available timeslots.",
+              "First, log into your account. Then select a provider, browse their available times, and choose a slot that works for you.",
+              "The booking process is simple: log in, select a service provider, pick an available time, and confirm.",
+              "You'll need to: 1) Log in 2) Select a provider 3) Choose a time slot 4) Confirm your appointment.",
+              "Access our scheduling system by logging in, then follow the step-by-step guide to book your preferred slot."
+          ],
+          "context": [""]
+      },
+      {
+        "tag": "login",
+        "patterns": [
+          "How do I log in?",
+            "Where can I log in?",
+            "I want to log in",
+            "Please help me to log in",
+            "Guide me how to login"
+        ],
+        "responses": [
+            "To log in, click the **Login** button in the top navigation bar.",
+            "You can access the login page by selecting the **Login** option from the navbar at the top.",
+            "Please use the **Login** button in the navigation bar to proceed to the login page."
+        ],
+        "context": ["login_redirect"]
+      },
+      {
+          "tag": "technical_support",
+          "patterns": [
+              "I'm having technical issues",
+              "Website not working",
+              "Can't log in",
+              "Error message",
+              "Technical problem",
+              "System glitch",
+              "Need tech help",
+              "Experiencing difficulties"
+          ],
+          "responses": [
+              "I'm sorry you're experiencing technical issues. Can you describe the problem in more detail?",
+              "Let's troubleshoot your technical concern. What specific error are you seeing?",
+              "Technical difficulties can be frustrating. Please provide more information about the issue.",
+              "Our support team is ready to help. What seems to be the problem?",
+              "Could you share more details about the technical issue you're facing?"
+          ],
+          "context": [""]
+      },
+      {
+          "tag": "service_unavailable",
+          "patterns": [
+              "Service not available",
+              "Feature not working",
+              "Can't access service",
+              "Broken functionality",
+              "Service down",
+              "Unable to use feature"
+          ],
+          "responses": [
+              "We apologize for the service interruption. Our team is working to resolve this quickly.",
+              "Thank you for bringing this to our attention. We'll investigate the service unavailability.",
+              "We're experiencing temporary service issues. Please try again later or contact support.",
+              "Our technical team has been notified about the service problem.",
+              "We appreciate your patience while we work on restoring the service."
+          ],
+          "context": [""]
+      },
+      {
+          "tag": "account_help",
+          "patterns": [
+              "Help with my account",
+              "Account issues",
+              "Can't access account",
+              "Password reset",
+              "Update account information",
+              "Account settings",
+              "Profile management"
+          ],
+          "responses": [
+              "I can help you with your account. What specific account-related issue are you experiencing?",
+              "Let's resolve your account concerns. Please provide more details.",
+              "For account assistance, I'll guide you through the process. What do you need help with?",
+              "Account management is our priority. How can I assist you today?",
+              "We're here to help you manage your account effectively."
+          ],
+          "context": [""]
+      },
+      {
+          "tag": "noanswer",
+          "patterns": [],
+          "responses": [
+              "Sorry, I couldn't understand that. Can you please rephrase?", 
+              "I'm not sure what you mean. Could you clarify?",
+              "Your message seems unclear. Could you provide more context?",
+              "I'm having trouble understanding. Can you explain in a different way?",
+              "Apologies, but I didn't catch that. Would you mind repeating?"
+          ],
+          "context": [""]
+      }
+  ]
+}
