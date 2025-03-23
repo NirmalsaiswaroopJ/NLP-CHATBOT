@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check Appointments</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .appointment-card {
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .appointment-header {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px 10px 0 0;
+        }
+        .appointment-body {
+            padding: 20px;
+        }
+        .section-header {
+            margin: 30px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #0d6efd;
+        }
+        .empty-message {
+            padding: 30px;
+            text-align: center;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">My Appointments</h1>
+        
+        <!-- Upcoming Appointments Section -->
+        <h2 class="section-header">Upcoming Appointments</h2>
+        <div id="upcoming-appointments-container">
+            <div class="text-center">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Cancelled Appointments Section -->
+        <h2 class="section-header">Cancelled Appointments</h2>
+        <div id="cancelled-appointments-container">
+            <div class="text-center">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="{{ url_for('user_home') }}" class="btn btn-secondary">Back to Home</a>
+            <a href="{{ url_for('book_appointment') }}" class="btn btn-primary">Book New Appointment</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Fetch appointments data from server
+            fetch('/user-appointments')  // Use the existing endpoint
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        displayAppointments(data.appointments);
+                    } else {
+                        showError(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching appointments:', error);
+                    showError('Failed to load appointments. Please try again later.');
+                });
+        });
+
+        function displayAppointments(appointments) {
+            const upcomingContainer = document.getElementById('upcoming-appointments-container');
+            const cancelledContainer = document.getElementById('cancelled-appointments-container');
+            
+            // Filter active and cancelled appointments
+            const upcomingAppointments = appointments.filter(app => !app.status || app.status === 'active');
+            const cancelledAppointments = appointments.filter(app => app.status === 'cancelled');
+            
+            // Clear loading spinners
+            upcomingContainer.innerHTML = '';
+            cancelledContainer.innerHTML = '';
+            
+            // Display upcoming appointments
+            if (upcomingAppointments.length > 0) {
+                const upcomingHtml = generateAppointmentsHtml(upcomingAppointments, true);
+                upcomingContainer.innerHTML = upcomingHtml;
+                
+                // Add event listeners for cancel buttons
+                document.querySelectorAll('.cancel-appointment-btn').forEach(button => {
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const appointmentId = this.getAttribute('data-id');
+                        if (confirm('Are you sure you want to cancel this appointment?')) {
+                            cancelAppointment(appointmentId);
+                        }
+                    });
+                });
+            } else {
+                upcomingContainer.innerHTML = `
+                    <div class="empty-message">
+                        <p>You don't have any upcoming appointments.</p>
+                        <a href="{{ url_for('book_appointment') }}" class="btn btn-primary">Book an Appointment</a>
+                    </div>
+                `;
+            }
+            
+            // Display cancelled appointments
+            if (cancelledAppointments.length > 0) {
+                const cancelledHtml = generateAppointmentsHtml(cancelledAppointments, false);
+                cancelledContainer.innerHTML = cancelledHtml;
+            } else {
+                cancelledContainer.innerHTML = `
+                    <div class="empty-message">
+                        <p>You don't have any cancelled appointments.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function generateAppointmentsHtml(appointments, isActive) {
+            let html = '<div class="row">';
+            
+            appointments.forEach(appointment => {
+                const date = new Date(appointment.appointment_date).toLocaleDateString();
+                const badgeClass = isActive ? 'bg-primary' : 'bg-danger';
+                const badgeText = isActive ? date : 'Cancelled';
+                const createdDate = appointment.created_at ? new Date(appointment.created_at).toLocaleDateString() : 'N/A';
+                
+                html += `
+                    <div class="col-md-6">
+                        <div class="appointment-card">
+                            <div class="appointment-header d-flex justify-content-between align-items-center">
+                                <h4>${appointment.doctor}</h4>
+                                <span class="badge ${badgeClass}">${badgeText}</span>
+                            </div>
+                            <div class="appointment-body">
+                                <p><strong>Patient:</strong> ${appointment.patient_name}</p>
+                                <p><strong>Date:</strong> ${date}</p>
+                                <p><strong>Time:</strong> ${appointment.appointment_time}</p>
+                                <p><strong>Contact:</strong> ${appointment.phone}</p>
+                                <p><strong>Email:</strong> ${appointment.email}</p>
+                                <p><strong>Booked on:</strong> ${createdDate}</p>
+                                ${isActive ? `
+                                    <button class="btn btn-danger cancel-appointment-btn" data-id="${appointment.id}">
+                                        Cancel Appointment
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            return html;
+        }
+
+        function cancelAppointment(appointmentId) {
+            fetch('/cancel-appointment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ appointment_id: appointmentId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Appointment cancelled successfully');
+                    location.reload(); // Refresh to show updated appointments
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error cancelling appointment:', error);
+                alert('Failed to cancel appointment. Please try again.');
+            });
+        }
+
+        function showError(message) {
+            document.getElementById('upcoming-appointments-container').innerHTML = `
+                <div class="alert alert-danger" role="alert">
+                    ${message}
+                </div>
+            `;
+            document.getElementById('cancelled-appointments-container').innerHTML = '';
+        }
+    </script>
+</body>
+</html>
